@@ -1,8 +1,8 @@
 'use strict'
 
-import base64 from 'base64-js'
-import aesjs from 'aes-js'
-import 'whatwg-fetch'
+var base64 = require('base64-js')
+var aesjs = require('aes-js')
+require('whatwg-fetch')
 
 function encodingPostData(postData, appSecret) {
     var iv = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -55,36 +55,51 @@ function ServingClient(serverUrl, appKey, appSecret) {
      * @api public
      */
     this.invoke = function (args) {
-        var req = encodingPostData(JSON.stringify(args.data), this.appSecret);
+        console.log(fetch)
 
-        var query = {
-            app_key: this.appKey,
-            method: args.method,
-            session_id: args.sessionId
-        };
 
-        var url = this.serverUrl + querystringify(query, '?');
-        return new Promise(function(resolve, reject) {
-            var postData = {
-                method: "POST",
-                header: {
-                    'Content-Type': 'application/json'
-                },
-                body: req
-            }
+    //     var req = encodingPostData(JSON.stringify(args.data), this.appSecret);
 
-            fetch('url', postData).then(function(res){
-                if (res.statusCode == 200){
-                    resolve(res.data)
-                }
-                else {
-                    reject(res.msg)
-                }
-            }).catch(function(err){
-                reject(err)
-            })
-        })
+    //     var query = {
+    //         app_key: this.appKey,
+    //         method: args.method,
+    //         session_id: args.sessionId
+    //     };
+
+    //     var url = this.serverUrl + querystringify(query, '?');
+    //     return new Promise(function(resolve, reject) {
+    //         var postData = {
+    //             method: "POST",
+    //             header: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: req
+    //         }
+
+    //         fetch('url', postData).then(function(res){
+    //             if (res.statusCode == 200){
+    //                 resolve(res.data)
+    //             }
+    //             else {
+    //                 reject(res.msg)
+    //             }
+    //         }).catch(function(err){
+    //             reject(err)
+    //         })
+    //     })
     }
 }
 
-exports.ServingClient=ServingClient
+module.exports = {
+    /**
+    * 创建 ServingClient 对象
+    *
+    * @param {String} serverUrl
+    * @param {String} appKey
+    * @param {String} appSecret
+    * @api public
+    */
+    servingClient: function (serverUrl, appKey, appSecret) {
+        return new ServingClient(serverUrl, appKey, appSecret);
+    }
+}
