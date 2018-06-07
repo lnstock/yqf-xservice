@@ -2,7 +2,7 @@
 
 var base64 = require('base64-js')
 var aesjs = require('aes-js')
-var fetch = require('node-fetch')
+var http = require('whatwg-fetch')
 
 function encodingPostData(postData, appSecret) {
     var iv = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -66,7 +66,7 @@ function ServingClient(serverUrl, appKey, appSecret) {
                 headers: { 'Content-Type': 'application/json' }
             }
 
-            fetch(url, postData)
+            http.fetch(url, postData)
                 .then(function(res){
                     if (res.status == 200 || res.status == 500){
                         res.json().then(json => {
