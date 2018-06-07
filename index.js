@@ -59,26 +59,33 @@ function ServingClient(serverUrl, appKey, appSecret) {
 
         var url = this.serverUrl + querystringify(query, '?');
 
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var postData = {
                 method: "POST",
                 body: body,
                 headers: { 'Content-Type': 'application/json' }
             }
 
-            fetch(url, postData).then(res => res.json())
-            .then(json => console.log(json));
+            fetch(url, postData)
+                .then(res => res.json().then(json => {
+                    if (res.statusCode == 200) {
+                        resolve(json)
+                    }
+                    else {
+                        reject(json)
+                    }
+                }));
 
-            fetch(url, postData).then(function(res){
-                if (res.statusCode == 200){
-                    resolve(res.data)
-                }
-                else {
-                    reject(res.msg)
-                }
-            }).catch(function(err){
-                reject(err)
-            })
+            // fetch(url, postData).then(function(res){
+            //     if (res.statusCode == 200){
+            //         resolve(res.data)
+            //     }
+            //     else {
+            //         reject(res.msg)
+            //     }
+            // }).catch(function(err){
+            //     reject(err)
+            // })
         })
     }
 }
