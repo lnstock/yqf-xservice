@@ -2,7 +2,7 @@
 
 var base64 = require('base64-js')
 var aesjs = require('aes-js')
-require('whatwg-fetch')
+var fetch = require('whatwg-fetch')
 
 function encodingPostData(postData, appSecret) {
     var iv = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -41,52 +41,43 @@ function ServingClient(serverUrl, appKey, appSecret) {
     this.appSecret = appSecret
 
     /**
-     * @typedef InvokeArgs
-     * @type Object
-     * @property {String} method 方法名
-     * @property {Object} data 传入的参数
-     * @property {String} sessionId 会话ID
-     */
-
-    /**
      * 开始执行
      *
-     * @param {InvokeArgs} args
+     * @param {String} method 方法名
+     * @param {Object} args 传入的参数
+     * @param {Object} sessionId 会话ID
      * @api public
      */
-    this.invoke = function (args) {
-        console.log(fetch)
+    this.invoke = function (method, args, sessionId) {
+        var req = encodingPostData(JSON.stringify(args.data), this.appSecret);
 
+        var query = {
+            app_key: this.appKey,
+            method: method,
+            session_id: sessionId
+        };
 
-    //     var req = encodingPostData(JSON.stringify(args.data), this.appSecret);
+        var url = this.serverUrl + querystringify(query, '?');
+        return new Promise(function(resolve, reject) {
+            var postData = {
+                method: "POST",
+                header: {
+                    'Content-Type': 'application/json'
+                },
+                body: req
+            }
 
-    //     var query = {
-    //         app_key: this.appKey,
-    //         method: args.method,
-    //         session_id: args.sessionId
-    //     };
-
-    //     var url = this.serverUrl + querystringify(query, '?');
-    //     return new Promise(function(resolve, reject) {
-    //         var postData = {
-    //             method: "POST",
-    //             header: {
-    //                 'Content-Type': 'application/json'
-    //             },
-    //             body: req
-    //         }
-
-    //         fetch('url', postData).then(function(res){
-    //             if (res.statusCode == 200){
-    //                 resolve(res.data)
-    //             }
-    //             else {
-    //                 reject(res.msg)
-    //             }
-    //         }).catch(function(err){
-    //             reject(err)
-    //         })
-    //     })
+            fetch('url', postData).then(function(res){
+                if (res.statusCode == 200){
+                    resolve(res.data)
+                }
+                else {
+                    reject(res.msg)
+                }
+            }).catch(function(err){
+                reject(err)
+            })
+        })
     }
 }
 
