@@ -2,7 +2,7 @@
 
 var base64 = require('base64-js')
 var aesjs = require('aes-js')
-var fetch = require('whatwg-fetch')
+var fetch = require('node-fetch')
 
 function encodingPostData(postData, appSecret) {
     var iv = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -49,7 +49,7 @@ function ServingClient(serverUrl, appKey, appSecret) {
      * @api public
      */
     this.invoke = function (method, args, sessionId) {
-        var req = encodingPostData(JSON.stringify(args.data), this.appSecret);
+        var body = encodingPostData(JSON.stringify(args), this.appSecret);
 
         var query = {
             app_key: this.appKey,
@@ -58,16 +58,18 @@ function ServingClient(serverUrl, appKey, appSecret) {
         };
 
         var url = this.serverUrl + querystringify(query, '?');
+
         return new Promise(function(resolve, reject) {
             var postData = {
                 method: "POST",
-                header: {
-                    'Content-Type': 'application/json'
-                },
-                body: req
+                body: body,
+                headers: { 'Content-Type': 'application/json' }
             }
 
-            fetch('url', postData).then(function(res){
+            fetch(url, postData).then(res => res.json())
+            .then(json => console.log(json));
+
+            fetch(url, postData).then(function(res){
                 if (res.statusCode == 200){
                     resolve(res.data)
                 }
