@@ -8,6 +8,5 @@ var req = {
 client.invoke('BaseDest.GetCityDetail', req).then(rsp=>{
     console.log(rsp)
 }).catch(err=>{
-    console.log('error')
     console.error(err)
 })
