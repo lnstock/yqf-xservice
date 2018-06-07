@@ -46,7 +46,7 @@ function ServingClient(serverUrl, appKey, appSecret) {
      * @param {String} method 方法名
      * @param {Object} args 传入的参数
      * @param {Object} sessionId 会话ID
-     * @api public
+     * @return  Promise
      */
     this.invoke = function (method, args, sessionId) {
         var body = encodingPostData(JSON.stringify(args), this.appSecret);
@@ -67,25 +67,24 @@ function ServingClient(serverUrl, appKey, appSecret) {
             }
 
             fetch(url, postData)
-                .then(res => res.json().then(json => {
-                    if (res.statusCode == 200) {
-                        resolve(json)
+                .then(function(res){
+                    if (res.status == 200 || res.status == 500){
+                        res.json().then(json => {
+                            if (res.status == 200) {
+                                resolve(json)
+                            }
+                            else {
+                                reject(json)
+                            }
+                        })
                     }
-                    else {
-                        reject(json)
+                    else{
+                        reject(res)
                     }
-                }));
-
-            // fetch(url, postData).then(function(res){
-            //     if (res.statusCode == 200){
-            //         resolve(res.data)
-            //     }
-            //     else {
-            //         reject(res.msg)
-            //     }
-            // }).catch(function(err){
-            //     reject(err)
-            // })
+                })
+                .catch(function(err){
+                    reject(err)
+                });
         })
     }
 }
@@ -97,7 +96,6 @@ module.exports = {
     * @param {String} serverUrl
     * @param {String} appKey
     * @param {String} appSecret
-    * @api public
     */
     servingClient: function (serverUrl, appKey, appSecret) {
         return new ServingClient(serverUrl, appKey, appSecret);
