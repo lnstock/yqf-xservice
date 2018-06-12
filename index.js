@@ -69,7 +69,7 @@ function ServingClient(serverUrl, appKey, appSecret) {
             fetch(url, postData)
                 .then(function(res){
                     if (res.status == 200 || res.status == 500){
-                        res.json().then(json => {
+                        res.json().then(function(json) {
                             if (res.status == 200) {
                                 resolve(json)
                             }
